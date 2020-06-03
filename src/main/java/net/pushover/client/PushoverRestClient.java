@@ -30,7 +30,7 @@ public class PushoverRestClient implements PushoverClient {
 	public static String PUSH_MESSAGE_URL = "https://api.pushover.net/1/messages.json";
 	public static final String SOUND_LIST_URL = "https://api.pushover.net/1/sounds.json";
 
-	private static final HttpUriRequest SOUND_LIST_REQUEST = new HttpGet(SOUND_LIST_URL);
+	private static HttpUriRequest SOUND_LIST_REQUEST = new HttpGet(SOUND_LIST_URL);
 
 	private HttpClient httpClient = HttpClients.custom().useSystemProperties().build();
 	
@@ -119,6 +119,14 @@ public class PushoverRestClient implements PushoverClient {
 
 	public void setProxy(HttpHost proxy) {
 		this.proxy = proxy;
+		
+		RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
+		reqconfigconbuilder = reqconfigconbuilder.setProxy(this.proxy);
+		RequestConfig config = reqconfigconbuilder.build();
+		
+		HttpGet get = new HttpGet(SOUND_LIST_URL);
+		get.setConfig(config);
+		SOUND_LIST_REQUEST = get;
 	}
 
 }
