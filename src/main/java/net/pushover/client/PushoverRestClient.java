@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -31,6 +33,8 @@ public class PushoverRestClient implements PushoverClient {
 	private static final HttpUriRequest SOUND_LIST_REQUEST = new HttpGet(SOUND_LIST_URL);
 
 	private HttpClient httpClient = HttpClients.custom().useSystemProperties().build();
+	
+	private HttpHost proxy;
 
 	private static final AtomicReference<Set<PushOverSound>> SOUND_CACHE = new AtomicReference<Set<PushOverSound>>();
 
@@ -67,6 +71,13 @@ public class PushoverRestClient implements PushoverClient {
 		}
 
 		post.setEntity(new UrlEncodedFormEntity(nvps, Charset.defaultCharset()));
+		if (proxy != null) {
+			RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
+			reqconfigconbuilder = reqconfigconbuilder.setProxy(proxy);
+			RequestConfig config = reqconfigconbuilder.build();
+			
+			post.setConfig(config);
+		}
 
 		try {
 			HttpResponse response = httpClient.execute(post);
@@ -104,6 +115,10 @@ public class PushoverRestClient implements PushoverClient {
 	 */
 	public void setHttpClient(HttpClient httpClient) {
 		this.httpClient = httpClient;
+	}
+
+	public void setProxy(HttpHost proxy) {
+		this.proxy = proxy;
 	}
 
 }
